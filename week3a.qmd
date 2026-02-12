@@ -1,0 +1,14 @@
+---
+title: "week3a"
+author: "Zihao Yu"
+format: html
+editor: visual
+---
+
+# 1.How will I tackle the problem.
+
+I will follow the instructions, use the formula to fill in the missing ratings, and select the highest predicted score from each user's unrated movies as the recommendation.
+
+# 2.What data challenges do I may anticipate?
+
+Since most users have only rated two movies, the bias is unstable. To improve accuracy, I might include ratings for films they haven't watched but have some knowledge of, thereby reducing the bias.
