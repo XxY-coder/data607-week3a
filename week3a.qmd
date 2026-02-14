@@ -12,3 +12,79 @@ I will follow the instructions, use the formula to fill in the missing ratings, 
 # 2.What data challenges do I may anticipate?
 
 Since most users have only rated two movies, the bias is unstable. To improve accuracy, I might include ratings for films they haven't watched but have some knowledge of, thereby reducing the bias.
+
+# 3.Read the data
+
+I create my xlsx and download it as a csv.
+
+```{r}
+library(tidyverse)
+library(readr)
+library(janitor)
+
+movies_rating <- read.csv("https://raw.githubusercontent.com/XxY-coder/data607-week3a/refs/heads/main/movies_ratings.csv") |>
+  clean_names()
+
+glimpse(movies_rating)
+
+rating_long <- 
+  movies_rating |>
+  pivot_longer(
+    cols = -critics,
+    names_to = "movies",
+    values_to = "rating"
+)
+
+glimpse(rating_long)
+```
+
+# 4.Calculations
+
+Finding those values.
+
+```{r}
+mu <- mean(rating_long$rating, na.rm = TRUE)
+mu
+
+user_bias <-
+  rating_long |>
+  group_by(critics) |>
+  summarise(
+    user_avg = mean(rating, na.rm = TRUE),
+    .group = "drop"
+) |>
+  mutate(b_u = user_avg -  mu)
+
+(user_bias)
+```
+
+```{r}
+movies_bias <-
+  rating_long |>
+  group_by(movies) |>
+  summarise(
+    movies_avg = mean(rating, na.rm = TRUE),
+    .group = "drop"
+) |>
+  mutate(b_i = movies_avg - mu)
+
+(movies_bias)
+```
+
+# 5.Calculate the missing ratings.
+
+```{r}
+pred <- 
+  rating_long |>
+  left_join(user_bias, by = "critics") |>
+  left_join(movies_bias, by = "movies") |>
+  mutate(r_hat = mu + b_u + b_i)
+
+view(pred)
+```
+
+# 6. Conclusion
+
+Since M was rating all the movies, so there is there are no recommendations here. ---For J's top 1 is 'zootopia2'(it is about 5.47 but consider as 5). ---For W's top 1 is 'The SpongBob Movie'(it is about 4.31). ---For HP's top 1 is 'zootopia2'(it is about 1.97) ---For ZH's top 1 is 'zootopia2'(it is about 4.72) ---For CO's top 1 is 'stranger_things_5'(it is about 3.74) ---For ZY's top 1 is 'zootopia2'(it is about 3.97)
+
+OpenAI. (2025). ChatGPT (Version 5.2) \[Large language model\]. https://chat.openai.com.
